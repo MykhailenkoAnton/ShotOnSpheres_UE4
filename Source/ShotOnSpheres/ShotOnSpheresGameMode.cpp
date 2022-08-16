@@ -1,7 +1,6 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include <string>
-#include <list>
 #include "ShotOnSpheresGameMode.h"
 #include "ShotOnSpheresHUD.h"
 #include "ShotOnSpheresCharacter.h"
@@ -24,49 +23,14 @@ void AShotOnSpheresGameMode::StartPlay()
 {
 	Super::StartPlay();
 
-
-	// Display a debug message for five seconds. 
-	// The -1 "Key" value argument prevents the message from being updated or refreshed.
-
-	int MAX = 15;
-	check(GEngine != nullptr);
-	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Yellow, TEXT("AShotOnSpheresGameMode::StartPlay method execute!"));
-
-	// get character location
-	FVector myLocChar = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
-
-
-	FActorSpawnParameters SpawnInfo;
-	FRotator myRot(0, 0, 0);
-
-	/*ACustomSphere* mySphere[15];*/
-	std::list< ACustomSphere*> mySphere;
-
-
-	for (int i = 0; i < 15; i++)
-	{
-		FVector myLoc = RandomLocation();
-
-		if (myLocChar == myLoc)
-		{
-			while (myLocChar != myLoc)
-			{
-				myLoc = RandomLocation();
-			}
-		}
-		check(GEngine != nullptr);
-		FString mystr = myLoc.ToString() + " " + FString::FromInt(i);
-		GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Yellow, mystr);
-		mySphere.push_back(GetWorld()->SpawnActor<ACustomSphere>(ACustomSphere::StaticClass(), myLoc, myRot, SpawnInfo));
-	}
+	CreateListSpheres();	
 }
 
-FVector AShotOnSpheresGameMode::RandomLocation()
+FVector AShotOnSpheresGameMode::RandomSphereLocation()
 {
-	// get character location
-	FVector myLocChar = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
 
-	// random distance and location Actor(Sphere)
+	FVector myLocChar = GetLocationMyCharater();
+
 	FVector randomLoc;
 	float MAX_DISTANCE = 2000.0f;
 	float distance = FMath::FRandRange(0.0f, MAX_DISTANCE);
@@ -98,4 +62,37 @@ FVector AShotOnSpheresGameMode::RandomLocation()
 	(rand >= 0) ? randomLoc.Y += myLocChar.Y : randomLoc.Y -= myLocChar.Y;
 
 	return randomLoc;
+}
+
+FVector AShotOnSpheresGameMode::GetLocationMyCharater()
+{
+	FVector Location = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
+	return Location;
+}
+
+void AShotOnSpheresGameMode::CreateListSpheres()
+{
+	// get character location
+	int MAX = 15;
+	FVector myLocChar = GetLocationMyCharater();
+
+	FActorSpawnParameters SpawnInfo;
+	FRotator myRot(0, 0, 0);
+
+	for (int i = 0; i < MAX; i++)
+	{
+		FVector myLoc = RandomSphereLocation();
+
+		if (myLocChar == myLoc)
+		{
+			while (myLocChar != myLoc)
+			{
+				myLoc = RandomSphereLocation();
+			}
+		}
+		check(GEngine != nullptr);
+		FString mystr = myLoc.ToString() + " " + FString::FromInt(i);
+		GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Yellow, mystr);
+		mySphere.push_back(GetWorld()->SpawnActor<ACustomSphere>(ACustomSphere::StaticClass(), myLoc, myRot, SpawnInfo));
+	}
 }

@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <list>
 #include "CustomSphere.h"
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
@@ -13,13 +14,17 @@ class AShotOnSpheresGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 protected:
-
-
+	std::list< ACustomSphere*> mySphere;
+	
 public:
 	AShotOnSpheresGameMode();
 
 	virtual void StartPlay() override;
-	FVector RandomLocation();
+	FVector RandomSphereLocation();
+
+	FVector GetLocationMyCharater();
+
+	void CreateListSpheres();
 };
 
 

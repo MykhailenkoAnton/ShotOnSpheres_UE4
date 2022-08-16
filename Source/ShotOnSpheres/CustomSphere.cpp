@@ -19,8 +19,8 @@ ACustomSphere::ACustomSphere()
 		VisualMesh->SetStaticMesh(SphereVisualAsset.Object);
 
 	}
-	/*check(GEngine != nullptr);
-	GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Orange, TEXT("CONSTRUCTOR"));*/
+	check(GEngine != nullptr);
+	GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Orange, TEXT("CONSTRUCTOR"));
 
 }
 
