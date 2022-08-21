@@ -1,7 +1,7 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
-#include <string>
 #include "ShotOnSpheresGameMode.h"
+#include <string>
 #include "ShotOnSpheresHUD.h"
 #include "ShotOnSpheresCharacter.h"
 #include "Engine/Engine.h"
@@ -11,28 +11,34 @@
 AShotOnSpheresGameMode::AShotOnSpheresGameMode()
 	: Super()
 {
+	PrimaryActorTick.bStartWithTickEnabled = true;
+	PrimaryActorTick.bCanEverTick = true;
+
 	// set default pawn class to our Blueprinted character
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/FirstPersonCPP/Blueprints/FirstPersonCharacter"));
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
 
 	// use our custom HUD class
-	HUDClass = AShotOnSpheresHUD::StaticClass();
+	HUDClass = AShotOnSpheresHUD::StaticClass();	
 }
 
-void AShotOnSpheresGameMode::StartPlay()
+
+void AShotOnSpheresGameMode::BeginPlay()
 {
-	Super::StartPlay();
+	Super::BeginPlay();
 
-	CreateListSpheres();	
+	//NY
+	CreateListSpheres();
 }
 
+
+// random location Actor(Sphere) relatively Character
 FVector AShotOnSpheresGameMode::RandomSphereLocation()
 {
 
+	FVector randomLoc;
 	FVector myLocChar = GetLocationMyCharater();
 
-	FVector randomLoc;
-	float MAX_DISTANCE = 2000.0f;
 	float distance = FMath::FRandRange(0.0f, MAX_DISTANCE);
 
 	randomLoc.Z = FMath::FRandRange(0.0f, distance);
@@ -52,7 +58,7 @@ FVector AShotOnSpheresGameMode::RandomSphereLocation()
 	auto temp = FMath::RandRange(-1, 1);
 	randomLoc.Y = (temp >= 0) ? distance : -(distance);
 
-	// random location Actor(Sphere) relatively Character
+	
 	randomLoc.Z += myLocChar.Z;
 
 	auto rand = FMath::RandRange(-1, 1);
@@ -73,26 +79,76 @@ FVector AShotOnSpheresGameMode::GetLocationMyCharater()
 void AShotOnSpheresGameMode::CreateListSpheres()
 {
 	// get character location
-	int MAX = 15;
 	FVector myLocChar = GetLocationMyCharater();
-
-	FActorSpawnParameters SpawnInfo;
 	FRotator myRot(0, 0, 0);
 
 	for (int i = 0; i < MAX; i++)
 	{
-		FVector myLoc = RandomSphereLocation();
-
-		if (myLocChar == myLoc)
+		FVector LocationSphere;
+		while (true)
 		{
-			while (myLocChar != myLoc)
+			LocationSphere = RandomSphereLocation();
+			auto it = std::find_if(mySphere.begin(), mySphere.end(), [&LocationSphere](ACustomSphere* sphere) {
+
+				return FVector::PointsAreNear(LocationSphere, sphere->GetLocSphere(), 80.0f);
+				});
+
+			if (it == mySphere.end())
 			{
-				myLoc = RandomSphereLocation();
+				break;
+			}
+			else
+			{
+				check(GEngine != nullptr);
+				GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Red, TEXT("Sphere near, go next iteration"));
 			}
 		}
+		
 		check(GEngine != nullptr);
-		FString mystr = myLoc.ToString() + " " + FString::FromInt(i);
+		FString mystr = LocationSphere.ToString() + " " + FString::FromInt(i);
 		GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Yellow, mystr);
-		mySphere.push_back(GetWorld()->SpawnActor<ACustomSphere>(ACustomSphere::StaticClass(), myLoc, myRot, SpawnInfo));
+
+		
+		auto Sphere = GetWorld()->SpawnActor<ACustomSphere>(ACustomSphere::StaticClass(), LocationSphere, myRot);
+		Sphere->SetLocSphere(LocationSphere);
+		mySphere.push_back(Sphere);
 	}
+}
+
+
+void AShotOnSpheresGameMode::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	
+}
+
+void AShotOnSpheresGameMode::CheckSpheresCount()
+{
+	int s = 0;
+	for (auto i : mySphere)
+	{
+		if (i->IsActorBeingDestroyed())
+		{
+			s++;
+		}
+	}
+
+	check(GEngine != nullptr);
+	GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Red, FString::FromInt(s));
+
+	if (s > 10)
+	{
+		for (auto i : mySphere)
+		{
+			i->Destroy();
+			check(GEngine != nullptr);
+			GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Orange, TEXT("CheckSpheresCount"));
+		}
+
+		GetWorld()->ForceGarbageCollection(true);
+		mySphere.clear();
+		CreateListSpheres();
+	}
+
 }

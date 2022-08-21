@@ -1,6 +1,7 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "ShotOnSpheresCharacter.h"
+#include "Engine/Engine.h"
 #include "ShotOnSpheresProjectile.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
@@ -19,6 +20,7 @@ DEFINE_LOG_CATEGORY_STATIC(LogFPChar, Warning, All);
 
 AShotOnSpheresCharacter::AShotOnSpheresCharacter()
 {
+	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
 
@@ -298,3 +300,4 @@ bool AShotOnSpheresCharacter::EnableTouchscreenMovement(class UInputComponent* P
 	
 	return false;
 }
+

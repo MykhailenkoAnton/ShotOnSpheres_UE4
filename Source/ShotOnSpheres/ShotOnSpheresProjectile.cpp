@@ -1,6 +1,7 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "ShotOnSpheresProjectile.h"
+#include "ShotOnSpheresGameMode.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 
@@ -41,16 +42,26 @@ void AShotOnSpheresProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* Other
 		Destroy();
 
 	}
-
+	//MY
 	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL))
 	{
 		ACustomSphere* myCastSphere = dynamic_cast<ACustomSphere*>(OtherActor);
 		if (myCastSphere)
 		{
 			myCastSphere->Destroy();
-			GetWorld()->ForceGarbageCollection(true);
+			AShotOnSpheresGameMode* GameMode = Cast<AShotOnSpheresGameMode>(GetWorld()->GetAuthGameMode());
+			if (GameMode)
+			{
+				check(GEngine != nullptr);
+				GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("VALID POINTER"));
+				GameMode->CheckSpheresCount();
+			}
+			
 			check(GEngine != nullptr);
 			GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, TEXT("TRUE"));
 		}
 	}
+
+
 }
+	

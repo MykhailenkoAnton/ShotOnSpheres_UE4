@@ -13,8 +13,6 @@ AShotOnSpheresHUD::AShotOnSpheresHUD()
 	static ConstructorHelpers::FObjectFinder<UTexture2D> CrosshairTexObj(TEXT("/Game/FirstPerson/Textures/FirstPersonCrosshair"));
 	CrosshairTex = CrosshairTexObj.Object;
 
-	check(GEngine != nullptr);
-	GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Black, TEXT("WHAT IS THAT???"));
 }
 
 
@@ -22,6 +20,7 @@ void AShotOnSpheresHUD::DrawHUD()
 {
 	Super::DrawHUD();
 
+	
 	// Draw very simple crosshair
 
 	// find center of the Canvas
@@ -35,5 +34,7 @@ void AShotOnSpheresHUD::DrawHUD()
 	FCanvasTileItem TileItem( CrosshairDrawPosition, CrosshairTex->Resource, FLinearColor::White);
 	TileItem.BlendMode = SE_BLEND_Translucent;
 	Canvas->DrawItem( TileItem );
+
+
 
 }

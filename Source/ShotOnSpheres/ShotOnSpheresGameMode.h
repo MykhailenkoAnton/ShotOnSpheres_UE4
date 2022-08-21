@@ -15,16 +15,21 @@ class AShotOnSpheresGameMode : public AGameModeBase
 
 protected:
 	std::list< ACustomSphere*> mySphere;
-	
+	//ACustomSphere* mySphere[15];
+	int MAX = 15;
+	float MAX_DISTANCE = 2000.0f;
 public:
 	AShotOnSpheresGameMode();
 
-	virtual void StartPlay() override;
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+
+public:
+	//MY
 	FVector RandomSphereLocation();
-
 	FVector GetLocationMyCharater();
-
 	void CreateListSpheres();
+	void CheckSpheresCount();
 };
 
 
