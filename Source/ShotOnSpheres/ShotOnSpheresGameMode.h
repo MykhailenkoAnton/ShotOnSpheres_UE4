@@ -15,21 +15,53 @@ class AShotOnSpheresGameMode : public AGameModeBase
 
 protected:
 	std::list< ACustomSphere*> mySphere;
-	//ACustomSphere* mySphere[15];
-	int MAX = 15;
+
+	// spheres objects. Ñhangeable.
+	int MAX_SPHERES = 15;
+
+	//Ñhangeable.
 	float MAX_DISTANCE = 2000.0f;
+
+	// wave count
+	int wave_count = 1;
 public:
 	AShotOnSpheresGameMode();
 
 	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaTime) override;
 
 public:
-	//MY
-	FVector RandomSphereLocation();
-	FVector GetLocationMyCharater();
+	// random location Actor(Sphere) relatively Character
+	FVector RandomSphereLocationRelativelyCharacter();
+
+	// Create List spheres
 	void CreateListSpheres();
+
+	// random location Actor(Sphere) relatively another Spheres
+	FVector LocationSphereRelativelySpheres();
+
+	// incrementing wave_count on n
+	void NumberOfWave(int n);
+
+	// set wave's number
+	void SetNumberWave(int n);
+
+	// set maximum distance
+	void SetMaxDistance(float max);
+
+	//get maximum distance
+	float GetMaxDistance();
+
+	// Get My Actor(Player) Location 
+	FVector GetLocationMyCharater();
+
+	// Check how spheres remains and show wave's number
 	void CheckSpheresCount();
+
+	// Set MAX_SPHERES spheres on scene
+	void SetMaxSpheres(float percent);
+
+	// Get MAX_SPHERES spheres on scene
+	int GetMaxSpheres();
 };
 
 

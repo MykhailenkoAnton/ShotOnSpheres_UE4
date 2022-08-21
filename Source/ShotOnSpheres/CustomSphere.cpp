@@ -14,6 +14,7 @@ ACustomSphere::ACustomSphere()
 	VisualMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	VisualMesh->SetupAttachment(RootComponent);
 	
+	//set mesh
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> SphereVisualAsset(TEXT("/Game/StarterContent/Shapes/Shape_Sphere.Shape_Sphere"));
 	if (SphereVisualAsset.Succeeded())
 	{
@@ -21,31 +22,21 @@ ACustomSphere::ACustomSphere()
 		
 	}
 
+	//set material
 	static ConstructorHelpers::FObjectFinder<UMaterial> SphereMateriallAsset(TEXT("/Game/StarterContent/Props/Materials/M_Chair"));
 	if (SphereMateriallAsset.Succeeded())
 	{
 		VisualMesh->SetMaterial(0, SphereMateriallAsset.Object);
 	}
 
-
-	/*std::string str;
-	str = std::to_string(Amount_Spheres);
-	check(GEngine != nullptr);
-	GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Orange, str.c_str());*/
-
-	/*check(GEngine != nullptr);
-	GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Orange, TEXT("CONSTRUCTOR"));*/
-
 }
 
+// to see when destructor will be called
 ACustomSphere::~ACustomSphere()
 {
-	/*std::string str;
-	str = std::to_string(Amount_Spheres);
+	// display destructor when all spheres destroyed
 	check(GEngine != nullptr);
-	GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Orange, str.c_str()); */
-	/*check(GEngine != nullptr);
-	GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Orange, TEXT("DESTRUCTOR"));*/
+	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Orange, TEXT("DESTRUCTOR"));
 }
 
 // Called when the game starts or when spawned
@@ -55,11 +46,13 @@ void ACustomSphere::BeginPlay()
 	
 }
 
+//set location for this sphere
 void ACustomSphere::SetLocSphere(FVector location)
 {
 	UniqLocation = location;
 }
 
+//get location this sphere
 FVector ACustomSphere::GetLocSphere()
 {
 	return UniqLocation;

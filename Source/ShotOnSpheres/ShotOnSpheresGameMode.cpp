@@ -27,13 +27,12 @@ void AShotOnSpheresGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//NY
 	CreateListSpheres();
 }
 
 
 // random location Actor(Sphere) relatively Character
-FVector AShotOnSpheresGameMode::RandomSphereLocation()
+FVector AShotOnSpheresGameMode::RandomSphereLocationRelativelyCharacter()
 {
 
 	FVector randomLoc;
@@ -70,85 +69,144 @@ FVector AShotOnSpheresGameMode::RandomSphereLocation()
 	return randomLoc;
 }
 
+// Get My Actor(Player) Location 
 FVector AShotOnSpheresGameMode::GetLocationMyCharater()
 {
 	FVector Location = GetWorld()->GetFirstPlayerController()->GetPawn()->GetActorLocation();
 	return Location;
 }
 
+// Create List spheres and save location every spehere
 void AShotOnSpheresGameMode::CreateListSpheres()
 {
-	// get character location
 	FVector myLocChar = GetLocationMyCharater();
 	FRotator myRot(0, 0, 0);
 
-	for (int i = 0; i < MAX; i++)
+	// display MAX_SPHERES
+	FString str = "Now MAX_SPHERES: ";
+	check(GEngine != nullptr);
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, str + FString::Printf(TEXT("%d"), MAX_SPHERES));
+
+	for (int i = 0; i < MAX_SPHERES; i++)
 	{
-		FVector LocationSphere;
-		while (true)
-		{
-			LocationSphere = RandomSphereLocation();
-			auto it = std::find_if(mySphere.begin(), mySphere.end(), [&LocationSphere](ACustomSphere* sphere) {
-
-				return FVector::PointsAreNear(LocationSphere, sphere->GetLocSphere(), 80.0f);
-				});
-
-			if (it == mySphere.end())
-			{
-				break;
-			}
-			else
-			{
-				check(GEngine != nullptr);
-				GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Red, TEXT("Sphere near, go next iteration"));
-			}
-		}
+		FVector LocationSphere = LocationSphereRelativelySpheres();
 		
+		// displays location spheres
 		check(GEngine != nullptr);
+		FString str = "Sphere location: ";
 		FString mystr = LocationSphere.ToString() + " " + FString::FromInt(i);
-		GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Yellow, mystr);
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, str + mystr);
 
 		
 		auto Sphere = GetWorld()->SpawnActor<ACustomSphere>(ACustomSphere::StaticClass(), LocationSphere, myRot);
 		Sphere->SetLocSphere(LocationSphere);
 		mySphere.push_back(Sphere);
 	}
+	NumberOfWave(1);
 }
 
-
-void AShotOnSpheresGameMode::Tick(float DeltaTime)
+// random location Actor(Sphere) relatively another Spheres
+FVector AShotOnSpheresGameMode::LocationSphereRelativelySpheres()
 {
-	Super::Tick(DeltaTime);
+	FVector LocationSphere;
+	while (true)
+	{
+		LocationSphere = RandomSphereLocationRelativelyCharacter();
+		auto it = std::find_if(mySphere.begin(), mySphere.end(), [&LocationSphere](ACustomSphere* sphere) {
 
-	
+			return FVector::PointsAreNear(LocationSphere, sphere->GetLocSphere(), sphere->GetSimpleCollisionRadius() + 80.0f);
+			});
+
+		if (it == mySphere.end())
+		{
+			break;
+		}
+		else
+		{
+			//display location sphere, if distance < 80
+			check(GEngine != nullptr);
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Sphere near, go next iteration"));
+		}
+	}
+	return LocationSphere;
 }
 
+// Check how many spheres remains
 void AShotOnSpheresGameMode::CheckSpheresCount()
 {
-	int s = 0;
+	int countSpheres = 1;
 	for (auto i : mySphere)
 	{
 		if (i->IsActorBeingDestroyed())
 		{
-			s++;
+			countSpheres++;
 		}
 	}
 
+	// display count spheres
+	FString str = "Destroy spheres: ";
 	check(GEngine != nullptr);
-	GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Red, FString::FromInt(s));
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, str + FString::FromInt(countSpheres));
 
-	if (s > 10)
+	if (countSpheres > 10)
 	{
 		for (auto i : mySphere)
 		{
 			i->Destroy();
-			check(GEngine != nullptr);
-			GEngine->AddOnScreenDebugMessage(-1, 20.0f, FColor::Orange, TEXT("CheckSpheresCount"));
 		}
 
 		GetWorld()->ForceGarbageCollection(true);
 		mySphere.clear();
+		SetMaxSpheres(0.10f);
+		SetMaxDistance(0.05f);
 		CreateListSpheres();
 	}
-
 }
+
+// incrementing wave_count on n
+void AShotOnSpheresGameMode::NumberOfWave(int n)
+{
+	FString str = "WAVE #: ";
+	// display wave's number
+	check(GEngine != nullptr);
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, str +  FString::FromInt(wave_count));
+	SetNumberWave(n);
+}
+
+// set wave's number
+void AShotOnSpheresGameMode::SetNumberWave(int n)
+{
+	wave_count += n;
+}
+
+// set maximum distance in %
+void AShotOnSpheresGameMode::SetMaxDistance(float percent)
+{
+	float temp = MAX_DISTANCE * percent;
+	MAX_DISTANCE += temp;
+
+	// display distance every wave
+	FString str = "Now MAX_DISTANCE = ";
+	check(GEngine != nullptr);
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Purple, str + FString::Printf(TEXT("%f"), MAX_DISTANCE));
+}
+
+//get maximum distance
+float AShotOnSpheresGameMode::GetMaxDistance()
+{
+	return MAX_DISTANCE;
+}
+
+// Set MAX_SPHERES spheres on scene
+void AShotOnSpheresGameMode::SetMaxSpheres(float percent)
+{
+	float temp = MAX_SPHERES * percent;
+	static_cast<int>(MAX_SPHERES += temp);
+}
+
+// Get MAX_SPHERES spheres on scene
+int AShotOnSpheresGameMode::GetMaxSpheres()
+{
+	return MAX_SPHERES;
+}
+
