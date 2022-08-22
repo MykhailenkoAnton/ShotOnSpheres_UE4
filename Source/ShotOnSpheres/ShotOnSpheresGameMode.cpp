@@ -83,21 +83,30 @@ void AShotOnSpheresGameMode::CreateListSpheres()
 	FRotator myRot(0, 0, 0);
 
 	// display MAX_SPHERES
-	FString str = "Now MAX_SPHERES: ";
+	/*FString str = "Now MAX_SPHERES: ";
 	check(GEngine != nullptr);
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, str + FString::Printf(TEXT("%d"), MAX_SPHERES));
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, str + FString::Printf(TEXT("%d"), MAX_SPHERES));*/
+
+	float temp = MAX_DISTANCE;
 
 	for (int i = 0; i < MAX_SPHERES; i++)
 	{
+		if (i < 10)
+		{
+			SetMaxDistance(1500.0f);
+		}
+		else
+		{
+			SetMaxDistance(temp);
+		}
 		FVector LocationSphere = LocationSphereRelativelySpheres();
 		
 		// displays location spheres
-		check(GEngine != nullptr);
+		/*check(GEngine != nullptr);
 		FString str = "Sphere location: ";
 		FString mystr = LocationSphere.ToString() + " " + FString::FromInt(i);
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, str + mystr);
+		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, str + mystr);*/
 
-		
 		auto Sphere = GetWorld()->SpawnActor<ACustomSphere>(ACustomSphere::StaticClass(), LocationSphere, myRot);
 		Sphere->SetLocSphere(LocationSphere);
 		mySphere.push_back(Sphere);
@@ -179,7 +188,7 @@ void AShotOnSpheresGameMode::SetNumberWave(int n)
 	wave_count += n;
 }
 
-// set maximum distance in %
+// set UP maximum distance. Add amount in % to MAX_DISTANCE
 void AShotOnSpheresGameMode::SetUpMaxDistance(float percent)
 {
 	float temp = MAX_DISTANCE * percent;
@@ -197,7 +206,7 @@ float AShotOnSpheresGameMode::GetMaxDistance()
 	return MAX_DISTANCE;
 }
 
-// Set MAX_SPHERES spheres on scene
+// Set UP MAX_SPHERES spheres on scene. Add amount in % to MAX_SPHERES
 void AShotOnSpheresGameMode::SetUpMaxSpheres(float percent)
 {
 	float temp = MAX_SPHERES * percent;
