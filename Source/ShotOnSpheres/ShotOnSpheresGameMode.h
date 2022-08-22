@@ -14,16 +14,17 @@ class AShotOnSpheresGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 protected:
-	std::list< ACustomSphere*> mySphere;
+	// list me Actors
+	std::list< ACustomSphere*> MySpheres_;
 
 	// spheres objects. Ñhangeable.
-	int MAX_SPHERES = 15;
+	int MaxSpheres_ = 15;
 
 	//Ñhangeable.
-	float MAX_DISTANCE = 2000.0f;
+	float MaxDistance_ = 2000.0f;
 
 	// wave count
-	int wave_count = 1;
+	int WaveCount_ = 1;
 public:
 	AShotOnSpheresGameMode();
 
@@ -37,7 +38,7 @@ public:
 	void CreateListSpheres();
 
 	// random location Actor(Sphere) relatively another Spheres
-	FVector LocationSphereRelativelySpheres();
+	FVector CheckLocationSphereRelativelySpheres();
 
 	// incrementing wave_count on n
 	void NumberOfWave(int n);

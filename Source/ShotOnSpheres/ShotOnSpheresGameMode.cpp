@@ -38,7 +38,7 @@ FVector AShotOnSpheresGameMode::RandomSphereLocationRelativelyCharacter()
 	FVector randomLoc;
 	FVector myLocChar = GetLocationMyCharater();
 
-	float distance = FMath::FRandRange(0.0f, MAX_DISTANCE);
+	float distance = FMath::FRandRange(0.0f, MaxDistance_);
 
 	randomLoc.Z = FMath::FRandRange(0.0f, distance);
 	distance -= randomLoc.Z;
@@ -80,53 +80,55 @@ FVector AShotOnSpheresGameMode::GetLocationMyCharater()
 void AShotOnSpheresGameMode::CreateListSpheres()
 {
 	FVector myLocChar = GetLocationMyCharater();
-	FRotator myRot(0, 0, 0);
+	FRotator MyRot(0, 0, 0);
 
-	// display MAX_SPHERES
-	/*FString str = "Now MAX_SPHERES: ";
+	float temp = MaxDistance_;
+
+	// display amount spheres every wave
+	FString str = "NOW SPHERES: ";
 	check(GEngine != nullptr);
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, str + FString::Printf(TEXT("%d"), MAX_SPHERES));*/
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, str + FString::FromInt(MaxSpheres_));
 
-	float temp = MAX_DISTANCE;
+	// display MaxDistance_ every wave
+	FString str1 = "NOW DISTANCE: ";
+	check(GEngine != nullptr);
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, str1 + FString::Printf(TEXT("%f"), MaxDistance_));
 
-	for (int i = 0; i < MAX_SPHERES; i++)
+	// spawn sphere
+	for (int i = 0; i < MaxSpheres_; i++)
 	{
+		// spawn 10 spheres in 1500 distance
 		if (i < 10)
 		{
 			SetMaxDistance(1500.0f);
 		}
 		else
 		{
+			// else spawn on MaxDistance_
 			SetMaxDistance(temp);
 		}
-		FVector LocationSphere = LocationSphereRelativelySpheres();
-		
-		// displays location spheres
-		/*check(GEngine != nullptr);
-		FString str = "Sphere location: ";
-		FString mystr = LocationSphere.ToString() + " " + FString::FromInt(i);
-		GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, str + mystr);*/
 
-		auto Sphere = GetWorld()->SpawnActor<ACustomSphere>(ACustomSphere::StaticClass(), LocationSphere, myRot);
+		FVector LocationSphere = CheckLocationSphereRelativelySpheres();
+		auto Sphere = GetWorld()->SpawnActor<ACustomSphere>(ACustomSphere::StaticClass(), LocationSphere, MyRot);
 		Sphere->SetLocSphere(LocationSphere);
-		mySphere.push_back(Sphere);
+		MySpheres_.push_back(Sphere);
 	}
 	NumberOfWave(1);
 }
 
 // random location Actor(Sphere) relatively another Spheres
-FVector AShotOnSpheresGameMode::LocationSphereRelativelySpheres()
+FVector AShotOnSpheresGameMode::CheckLocationSphereRelativelySpheres()
 {
 	FVector LocationSphere;
 	while (true)
 	{
 		LocationSphere = RandomSphereLocationRelativelyCharacter();
-		auto it = std::find_if(mySphere.begin(), mySphere.end(), [&LocationSphere](ACustomSphere* sphere) {
+		auto it = std::find_if(MySpheres_.begin(), MySpheres_.end(), [&LocationSphere](ACustomSphere* sphere) {
 
 			return FVector::PointsAreNear(LocationSphere, sphere->GetLocSphere(), sphere->GetSimpleCollisionRadius() + 80.0f);
 			});
 
-		if (it == mySphere.end())
+		if (it == MySpheres_.end())
 		{
 			break;
 		}
@@ -134,7 +136,7 @@ FVector AShotOnSpheresGameMode::LocationSphereRelativelySpheres()
 		{
 			//display location sphere, if distance < 80
 			check(GEngine != nullptr);
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Sphere near, go next iteration"));
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("Sphere near, go next iteration what would generate new location"));
 		}
 	}
 	return LocationSphere;
@@ -143,29 +145,29 @@ FVector AShotOnSpheresGameMode::LocationSphereRelativelySpheres()
 // Check how many spheres remains
 void AShotOnSpheresGameMode::CheckSpheresCount()
 {
-	int countSpheres = 1;
-	for (auto i : mySphere)
+	int CountSpheres = 1;
+	for (auto i : MySpheres_)
 	{
 		if (i->IsActorBeingDestroyed())
 		{
-			countSpheres++;
+			CountSpheres++;
 		}
 	}
 
 	// display count spheres
 	FString str = "Destroy spheres: ";
 	check(GEngine != nullptr);
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, str + FString::FromInt(countSpheres));
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, str + FString::FromInt(CountSpheres));
 
-	if (countSpheres > 10)
+	if (CountSpheres > 10)
 	{
-		for (auto i : mySphere)
+		for (auto i : MySpheres_)
 		{
 			i->Destroy();
 		}
 
 		GetWorld()->ForceGarbageCollection(true);
-		mySphere.clear();
+		MySpheres_.clear();
 		SetUpMaxSpheres(0.10f);
 		SetUpMaxDistance(0.05f);
 		CreateListSpheres();
@@ -178,54 +180,49 @@ void AShotOnSpheresGameMode::NumberOfWave(int n)
 	FString str = "WAVE #: ";
 	// display wave's number
 	check(GEngine != nullptr);
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, str +  FString::FromInt(wave_count));
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Magenta, str +  FString::FromInt(WaveCount_));
 	SetNumberWave(n);
 }
 
 // set wave's number
 void AShotOnSpheresGameMode::SetNumberWave(int n)
 {
-	wave_count += n;
+	WaveCount_ += n;
 }
 
-// set UP maximum distance. Add amount in % to MAX_DISTANCE
+// set UP maximum distance. Add amount in % to MaxDistance_
 void AShotOnSpheresGameMode::SetUpMaxDistance(float percent)
 {
-	float temp = MAX_DISTANCE * percent;
-	MAX_DISTANCE += temp;
-
-	// display distance every wave
-	FString str = "Now MAX_DISTANCE = ";
-	check(GEngine != nullptr);
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Purple, str + FString::Printf(TEXT("%f"), MAX_DISTANCE));
+	float temp = MaxDistance_ * percent;
+	MaxDistance_ += temp;
 }
 
 //get maximum distance
 float AShotOnSpheresGameMode::GetMaxDistance()
 {
-	return MAX_DISTANCE;
+	return MaxDistance_;
 }
 
-// Set UP MAX_SPHERES spheres on scene. Add amount in % to MAX_SPHERES
+// Set UP MaxSpheres_ spheres on scene. Add amount in % to MaxSpheres_
 void AShotOnSpheresGameMode::SetUpMaxSpheres(float percent)
 {
-	float temp = MAX_SPHERES * percent;
-	static_cast<int>(MAX_SPHERES += temp);
+	float temp = MaxSpheres_ * percent;
+	static_cast<int>(MaxSpheres_ += temp);
 }
 
 void AShotOnSpheresGameMode::SetMaxDistance(float max)
 {
-	MAX_DISTANCE = max;
+	MaxDistance_ = max;
 }
 
 void AShotOnSpheresGameMode::SetMaxSpheres(int n)
 {
-	MAX_SPHERES = n;
+	MaxSpheres_ = n;
 }
 
 // Get MAX_SPHERES spheres on scene
 int AShotOnSpheresGameMode::GetMaxSpheres()
 {
-	return MAX_SPHERES;
+	return MaxSpheres_;
 }
 

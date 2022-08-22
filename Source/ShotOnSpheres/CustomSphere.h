@@ -26,10 +26,10 @@ public:
 
 	// MyMesh
 	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* VisualMesh;
+	UStaticMeshComponent* VisualMesh_;
 
 	// saved sphere location
-	FVector UniqLocation;
+	FVector UniqLocation_;
 	
 	//set location for this sphere
 	void SetLocSphere(FVector location);

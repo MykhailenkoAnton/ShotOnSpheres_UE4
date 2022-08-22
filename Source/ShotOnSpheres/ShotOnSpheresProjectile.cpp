@@ -42,20 +42,17 @@ void AShotOnSpheresProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* Other
 		Destroy();
 
 	}
+
 	// Destroy only my actor(spheres)
 	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL))
 	{
-		ACustomSphere* myCastSphere = dynamic_cast<ACustomSphere*>(OtherActor);
-		if (myCastSphere)
+		ACustomSphere* MyCastSphere = dynamic_cast<ACustomSphere*>(OtherActor);
+		if (MyCastSphere)
 		{
-			myCastSphere->Destroy();
+			MyCastSphere->Destroy();
 			AShotOnSpheresGameMode* GameMode = Cast<AShotOnSpheresGameMode>(GetWorld()->GetAuthGameMode());
 			if (GameMode)
 			{
-				// display valid pointer to use CheckSpheresCount
-				check(GEngine != nullptr);
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, TEXT("VALID POINTER for call \"CheckSpheresCount()\""));
-
 				GameMode->CheckSpheresCount();
 			}
 		}

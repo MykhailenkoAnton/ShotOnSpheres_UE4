@@ -11,14 +11,14 @@ ACustomSphere::ACustomSphere()
 	PrimaryActorTick.bCanEverTick = true;
 
 
-	VisualMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	VisualMesh->SetupAttachment(RootComponent);
+	VisualMesh_ = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	VisualMesh_->SetupAttachment(RootComponent);
 	
 	//set mesh
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> SphereVisualAsset(TEXT("/Game/StarterContent/Shapes/Shape_Sphere.Shape_Sphere"));
 	if (SphereVisualAsset.Succeeded())
 	{
-		VisualMesh->SetStaticMesh(SphereVisualAsset.Object);
+		VisualMesh_->SetStaticMesh(SphereVisualAsset.Object);
 		
 	}
 
@@ -26,7 +26,7 @@ ACustomSphere::ACustomSphere()
 	static ConstructorHelpers::FObjectFinder<UMaterial> SphereMateriallAsset(TEXT("/Game/StarterContent/Props/Materials/M_Chair"));
 	if (SphereMateriallAsset.Succeeded())
 	{
-		VisualMesh->SetMaterial(0, SphereMateriallAsset.Object);
+		VisualMesh_->SetMaterial(0, SphereMateriallAsset.Object);
 	}
 
 }
@@ -34,9 +34,6 @@ ACustomSphere::ACustomSphere()
 // to see when destructor will be called
 ACustomSphere::~ACustomSphere()
 {
-	// display destructor when all spheres destroyed
-	check(GEngine != nullptr);
-	GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Orange, TEXT("DESTRUCTOR"));
 }
 
 // Called when the game starts or when spawned
@@ -49,11 +46,11 @@ void ACustomSphere::BeginPlay()
 //set location for this sphere
 void ACustomSphere::SetLocSphere(FVector location)
 {
-	UniqLocation = location;
+	UniqLocation_ = location;
 }
 
 //get location this sphere
 FVector ACustomSphere::GetLocSphere()
 {
-	return UniqLocation;
+	return UniqLocation_;
 }
