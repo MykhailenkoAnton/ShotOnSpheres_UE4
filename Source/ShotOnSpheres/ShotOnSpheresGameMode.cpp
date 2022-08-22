@@ -85,7 +85,7 @@ void AShotOnSpheresGameMode::CreateListSpheres()
 	// display MAX_SPHERES
 	FString str = "Now MAX_SPHERES: ";
 	check(GEngine != nullptr);
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, str + FString::Printf(TEXT("%d"), MAX_SPHERES));
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, str + FString::Printf(TEXT("%d"), MAX_SPHERES));
 
 	for (int i = 0; i < MAX_SPHERES; i++)
 	{
@@ -157,8 +157,8 @@ void AShotOnSpheresGameMode::CheckSpheresCount()
 
 		GetWorld()->ForceGarbageCollection(true);
 		mySphere.clear();
-		SetMaxSpheres(0.10f);
-		SetMaxDistance(0.05f);
+		SetUpMaxSpheres(0.10f);
+		SetUpMaxDistance(0.05f);
 		CreateListSpheres();
 	}
 }
@@ -180,7 +180,7 @@ void AShotOnSpheresGameMode::SetNumberWave(int n)
 }
 
 // set maximum distance in %
-void AShotOnSpheresGameMode::SetMaxDistance(float percent)
+void AShotOnSpheresGameMode::SetUpMaxDistance(float percent)
 {
 	float temp = MAX_DISTANCE * percent;
 	MAX_DISTANCE += temp;
@@ -198,10 +198,20 @@ float AShotOnSpheresGameMode::GetMaxDistance()
 }
 
 // Set MAX_SPHERES spheres on scene
-void AShotOnSpheresGameMode::SetMaxSpheres(float percent)
+void AShotOnSpheresGameMode::SetUpMaxSpheres(float percent)
 {
 	float temp = MAX_SPHERES * percent;
 	static_cast<int>(MAX_SPHERES += temp);
+}
+
+void AShotOnSpheresGameMode::SetMaxDistance(float max)
+{
+	MAX_DISTANCE = max;
+}
+
+void AShotOnSpheresGameMode::SetMaxSpheres(int n)
+{
+	MAX_SPHERES = n;
 }
 
 // Get MAX_SPHERES spheres on scene

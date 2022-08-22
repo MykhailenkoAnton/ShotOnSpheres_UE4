@@ -46,7 +46,7 @@ public:
 	void SetNumberWave(int n);
 
 	// set maximum distance
-	void SetMaxDistance(float max);
+	void SetUpMaxDistance(float max);
 
 	//get maximum distance
 	float GetMaxDistance();
@@ -58,10 +58,14 @@ public:
 	void CheckSpheresCount();
 
 	// Set MAX_SPHERES spheres on scene
-	void SetMaxSpheres(float percent);
+	void SetUpMaxSpheres(float percent);
 
 	// Get MAX_SPHERES spheres on scene
 	int GetMaxSpheres();
+
+	void SetMaxDistance(float max);
+
+	void SetMaxSpheres(int n);
 };
 
 
